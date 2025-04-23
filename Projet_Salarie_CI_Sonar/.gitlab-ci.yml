@@ -1,0 +1,23 @@
+stages:
+  - test
+  - analysis
+
+phpunit:
+  image: php:8.1
+  stage: test
+  script:
+    - apt-get update && apt-get install -y git unzip zip wget
+    - curl -sS https://getcomposer.org/installer | php
+    - php composer.phar require phpunit/phpunit --dev
+    - ./vendor/bin/phpunit --coverage-clover=coverage.xml
+  artifacts:
+    paths:
+      - coverage.xml
+
+sonarqube-check:
+  image: sonarsource/sonar-scanner-cli
+  stage: analysis
+  script:
+    - sonar-scanner
+  only:
+    - main
